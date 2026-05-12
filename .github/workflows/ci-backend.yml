@@ -47,22 +47,21 @@ jobs:
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend:latest ./backend
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend:${{ github.sha }} ./backend
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend --all-tags
-
-  update-helm:
-    runs-on: ubuntu-latest
+update-helm:
     needs: push
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Update Helm Chart values
+        with:
+          fetch-depth: 0
+      - name: Update Backend tag in Helm
         run: |
           sed -i "s|tag:.*|tag: \"${{ github.sha }}\"|" ./helm/values.yaml
-      - name: Commit and push
-        run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git pull origin feature/ci-cd --rebase  # השורה הזו מצילה אותנו
           git add ./helm/values.yaml
-          git commit -m "Update image tag [skip ci]" || echo "No changes to commit"
+          git pull origin feature/ci-cd --rebase
+          git commit -m "Update backend image tag [skip ci]" || echo "No changes"
           git push origin feature/ci-cd
