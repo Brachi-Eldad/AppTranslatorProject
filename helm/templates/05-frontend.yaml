@@ -2,8 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
+  labels:
+    app: frontend
 spec:
-  replicas: 1
+  replicas: {{ .Values.frontend.replicas }}
   selector:
     matchLabels:
       app: frontend
@@ -14,21 +16,19 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: brachieldod/app-translator-frontend:latest
-        imagePullPolicy: Always
+        image: {{ .Values.frontend.image }}
         ports:
-        - containerPort: 80
+        - containerPort: {{ .Values.frontend.port }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: frontend-service
 spec:
-  type: ClusterIP
   selector:
     app: frontend
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
-      nodePort: 30007
+      port: {{ .Values.frontend.port }}
+      targetPort: {{ .Values.frontend.port }}
+  type: ClusterIP

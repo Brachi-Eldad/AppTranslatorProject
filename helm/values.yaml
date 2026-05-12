@@ -1,0 +1,18 @@
+backend:
+  image: brachieldod/app-translator-backend:latest
+  replicas: 2
+  port: 3001
+
+frontend:
+  image: brachieldod/app-translator-frontend:latest
+  replicas: 1
+  port: 80
+
+database:
+  user: postgres
+  password: postgres
+  dbName: translations
+  storage: 1Gi
+
+ingress:
+  host: translator.local
