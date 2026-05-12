@@ -33,6 +33,7 @@ services:
     environment:
       LT_SUPPRESS_KEY_WARNING: "true"
       LT_SSL_VERIFY: "false"
+      LT_HOST: "0.0.0.0"
     ports:
       - "5000:5000"
     networks:
