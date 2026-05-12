@@ -2,9 +2,8 @@ name: CI Frontend
 
 on:
   push:
-    branches: [ feature/ci-cd, main ]
-    paths:
-      - 'frontend/**'
+    branches: [ "feature/ci-cd", "main" ]
+  workflow_dispatch:
 
 jobs:
   build-and-push:
@@ -41,6 +40,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git pull origin feature/ci-cd --rebase
           git add ./helm/values.yaml
-          git commit -m "Update frontend image tag"
+          git commit -m "Update frontend image tag [skip ci]" || echo "No changes to commit"
           git push origin feature/ci-cd
