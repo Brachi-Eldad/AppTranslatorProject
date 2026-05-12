@@ -8,11 +8,36 @@ frontend:
   replicas: 1
   port: 80
 
-database:
-  user: postgres
-  password: postgres
-  dbName: translations
-  storage: 1Gi
+translator:
+  image: libretranslate/libretranslate:latest
+  replicas: 1
+  port: 5000
+
+postgresql:
+  auth:
+    existingSecret: "postgres-password"
+    secretKeys:
+      adminPasswordKey: "password"
+      userPasswordKey: "password"
+    username: postgres
+    database: translations
+  primary:
+    initdb:
+      scripts:
+        init.sql: |
+          CREATE TABLE IF NOT EXISTS translations (
+            id SERIAL PRIMARY KEY,
+            source_text TEXT NOT NULL,
+            target_lang VARCHAR(10) NOT NULL,
+            translated_text TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT now()
+          );
+    persistence:
+      enabled: true
+      size: 10Gi
+    nodeSelector:
+      kubernetes.io/hostname: minikube
 
 ingress:
+  enabled: true
   host: translator.local
