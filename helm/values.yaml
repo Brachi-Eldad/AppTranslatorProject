@@ -1,15 +1,15 @@
-tag: "03da63d447cfc24010ff05811378dcc1380b7a58"
+tag: "57da3dbde2595e0639f794f1d02b1ffcbda07128"
 
 backend:
   image:
     repository: brachieldod/app-translator-backend
-    tag: "03da63d447cfc24010ff05811378dcc1380b7a58"
+    tag: "57da3dbde2595e0639f794f1d02b1ffcbda07128"
   port: 3001
 
 frontend:
   image:
     repository: brachieldod/app-translator-frontend
-    tag: "03da63d447cfc24010ff05811378dcc1380b7a58"
+    tag: "57da3dbde2595e0639f794f1d02b1ffcbda07128"
   replicas: 1
   port: 80
 
