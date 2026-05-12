@@ -49,19 +49,22 @@ jobs:
     name: Update Helm Manifests
     runs-on: ubuntu-latest
     needs: build-and-push
+    permissions: # הוספת הרשאות מפורשות בתוך הקוד
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }} # שימוש בטוקן הפנימי של גיטהאב
+          fetch-depth: 0
 
-      - name: Update values.yaml
+      - name: Update backend tag in values.yaml
         run: |
-          sed -i "s/tag: .*/tag: \"${{ github.sha }}\"/g" helm/values.yaml
+          # פקודה חכמה שמעדכנת רק את ה-tag שנמצא מתחת ל-backend
+          sed -i '/backend:/,/tag:/ s/tag: .*/tag: "${{ github.sha }}"/' helm/values.yaml
           
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add helm/values.yaml
-          git commit -m "CD: Update backend image tag to ${{ github.sha }}"
-          git push
+          git commit -m "CD: Update backend image tag to ${{ github.sha }}" || echo "No changes to commit"
+          git push origin feature/ci-cd

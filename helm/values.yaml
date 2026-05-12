@@ -1,6 +1,7 @@
 backend:
-  image: brachieldod/app-translator-backend:latest
-  replicas: 2
+  image:
+    repository: brachieldod/app-translator-backend
+    tag: "latest"
   port: 3001
 
 frontend:
