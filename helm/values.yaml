@@ -1,7 +1,7 @@
 backend:
   image:
     repository: brachieldod/app-translator-backend
-    tag: "latest"
+    tag: "70c7c16c9a196adeb597e40aa9fc3b25d0946d62"
   port: 3001
 
 frontend:
