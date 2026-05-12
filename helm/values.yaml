@@ -1,11 +1,16 @@
+tag: "70c7c16c9a196adeb597e40aa9fc3b25d0946d62"
+frontendTag: "latest"
+
 backend:
   image:
     repository: brachieldod/app-translator-backend
-    tag: "10ac101350acd6f062baa497c8dfd4c66c71195d"
+    tag: "latest" 
   port: 3001
 
 frontend:
-  image: brachieldod/app-translator-frontend:latest
+  image:
+    repository: brachieldod/app-translator-frontend
+    tag: "latest" 
   replicas: 1
   port: 80
 
