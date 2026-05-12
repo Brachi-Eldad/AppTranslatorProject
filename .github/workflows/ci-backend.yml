@@ -58,10 +58,11 @@ jobs:
       - name: Update Helm Chart values
         run: |
           sed -i "s|tag:.*|tag: \"${{ github.sha }}\"|" ./helm/values.yaml
-      - name: Commit and push changes
+      - name: Commit and push
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git pull origin feature/ci-cd --rebase  # השורה הזו מצילה אותנו
           git add ./helm/values.yaml
-          git commit -m "Update backend image tag to ${{ github.sha }}"
-          git push origin feature/ci-cd# force rerun
+          git commit -m "Update image tag [skip ci]" || echo "No changes to commit"
+          git push origin feature/ci-cd
