@@ -1,0 +1,54 @@
+version: '3.8'
+
+networks:
+  appnet:
+    driver: bridge
+
+services:
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    networks:
+      - appnet
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/translations
+      TRANSLATOR_URL: http://translator:5000/translate
+    ports:
+      - "3001:3001"
+    networks:
+      - appnet
+    depends_on:
+      - db
+      - translator
+
+  translator:
+    image: libretranslate/libretranslate
+    environment:
+      LT_SUPPRESS_KEY_WARNING: "true"
+      LT_SSL_VERIFY: "false"
+    ports:
+      - "5000:5000"
+    networks:
+      - appnet
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: translations
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - app-db-data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - appnet
+
+volumes:
+  app-db-data:
