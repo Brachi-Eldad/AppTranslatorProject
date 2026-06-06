@@ -1,0 +1,39 @@
+name: Full App CI-CD
+
+on:
+  push:
+    branches: [ feature/ci-cd, main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push Backend
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend:${{ github.sha }} ./backend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend:${{ github.sha }}
+
+      - name: Build & Push Frontend
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-frontend:${{ github.sha }} ./frontend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-frontend:${{ github.sha }}
+
+      - name: Update Helm Tags
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          sed -i "s|tag:.*|tag: \"${{ github.sha }}\"|" ./helm/values.yaml
+          sed -i "s|frontendTag:.*|frontendTag: \"${{ github.sha }}\"|" ./helm/values.yaml
+          
+          git add ./helm/values.yaml
+          git commit -m "Update image tags to ${{ github.sha }} [skip ci]" || echo "No changes"
+          git push origin feature/ci-cd

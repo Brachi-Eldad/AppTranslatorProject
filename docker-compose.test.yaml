@@ -1,0 +1,24 @@
+services:
+  db-test:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: translations_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d translations_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend-test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgres://postgres:password@db-test:5432/translations_test
+      - PORT=3001
+    depends_on:
+      db-test:
+        condition: service_healthy
+    command: npm test
