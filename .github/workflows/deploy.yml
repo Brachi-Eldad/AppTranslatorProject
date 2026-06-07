@@ -19,3 +19,5 @@ jobs:
           aws-region: eu-north-1
       - name: Deploy to S3
         run: aws s3 sync . s3://app-translator-frontend-bucket --delete --exclude ".git/*"
+
+

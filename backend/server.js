@@ -19,7 +19,7 @@ app.get('/health', (req, res) => {
 
 async function translateText(text, target) {
   try {
-    const translatorHost = process.env.TRANSLATOR_HOST || 'libretranslate-service';
+    const translatorHost = process.env.TRANSLATOR_HOST || 'translator';
     const res = await fetch(`http://${translatorHost}:5000/translate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

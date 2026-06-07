@@ -30,6 +30,7 @@ services:
 
   translator:
     image: libretranslate/libretranslate
+    restart: unless-stopped
     environment:
       LT_SUPPRESS_KEY_WARNING: "true"
       LT_SSL_VERIFY: "false"
