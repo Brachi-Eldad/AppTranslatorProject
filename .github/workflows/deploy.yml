@@ -16,6 +16,6 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: Europe (Stockholm) eu-north-1
+          aws-region: eu-north-1
       - name: Deploy to S3
         run: aws s3 sync . s3://app-translator-frontend-bucket --delete --exclude ".git/*"
