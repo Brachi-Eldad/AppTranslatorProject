@@ -19,7 +19,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy to S3
-        run: aws s3 sync . s3://app-translator-frontend-bucket --delete --exclude ".git/*"
+        run: aws s3 sync ./frontend s3://app-translator-frontend-bucket --delete --exclude ".git/*"
 
   # שלב 2: פריסת ה-Backend ל-EC2
   deploy-ec2:
@@ -33,15 +33,14 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-     script: |
-          echo "Pulling new image..."
-          sudo docker pull brachieldod/app-translator-backend:latest
+            echo "Pulling new image..."
+            sudo docker pull brachieldod/app-translator-backend:latest
 
-          echo "Stopping old container..."
-          sudo docker stop my-app || true
-          sudo docker rm my-app || true
+            echo "Stopping old container..."
+            sudo docker stop my-app || true
+            sudo docker rm my-app || true
 
-          echo "Starting new container..."
-          sudo docker run -d --name my-app -p 3001:80 brachieldod/app-translator-backend:latest
+            echo "Starting new container..."
+            sudo docker run -d --name my-app -p 80:3001 brachieldod/app-translator-backend:latest
 
-          echo "Deployment finished!"
+            echo "Deployment finished!"
