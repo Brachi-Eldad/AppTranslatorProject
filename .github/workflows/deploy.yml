@@ -1,0 +1,21 @@
+name: Deploy to S3
+on:
+  push:
+    branches:
+      - main
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: Europe (Stockholm) eu-north-1
+      - name: Deploy to S3
+        run: aws s3 sync . s3://app-translator-frontend-bucket --delete --exclude ".git/*"
