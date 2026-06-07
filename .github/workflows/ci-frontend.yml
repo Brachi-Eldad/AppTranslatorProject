@@ -1,4 +1,4 @@
-name: CI Frontend
+\name: CI Frontend
 
 on:
   push:
@@ -13,15 +13,23 @@ on:
 
 jobs:
   build:
-    name: Build Frontend
+    name: Build and Test Frontend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Verify files
-        run: |
-          ls -la frontend/
-          echo "✅ Frontend files verified"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
 
   push:
     name: Push to DockerHub
@@ -48,5 +56,5 @@ jobs:
           context: ./frontend
           push: true
           tags: |
-            brachieldad/app-translator-frontend:latest
+            brachieldod/app-translator-frontend:latest
             brachieldad/app-translator-frontend:${{ github.sha }}
