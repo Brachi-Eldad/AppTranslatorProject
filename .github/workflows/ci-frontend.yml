@@ -57,4 +57,4 @@ jobs:
           push: true
           tags: |
             brachieldod/app-translator-frontend:latest
-            brachieldad/app-translator-frontend:${{ github.sha }}
+            brachieldod/app-translator-frontend:${{ github.sha }}
