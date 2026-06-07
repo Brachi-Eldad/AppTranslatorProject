@@ -33,14 +33,15 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "Pulling new image..."
-            sudo docker pull brachieldod/app-translator-backend:latest
-            
-            echo "Stopping old container..."
-            sudo docker stop my-app || true
-            sudo docker rm my-app || true
-            
-            echo "Starting new container..."
-            sudo docker run -d --name my-app -p 80:80 brachieldod/app-translator-backend:latest
-            
-            echo "Deployment finished!"
+     script: |
+          echo "Pulling new image..."
+          sudo docker pull brachieldod/app-translator-backend:latest
+
+          echo "Stopping old container..."
+          sudo docker stop my-app || true
+          sudo docker rm my-app || true
+
+          echo "Starting new container..."
+          sudo docker run -d --name my-app -p 80:80 brachieldod/app-translator-backend:latest
+
+          echo "Deployment finished!"
