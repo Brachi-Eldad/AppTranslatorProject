@@ -62,3 +62,7 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend:${{ github.sha }}
+
+
+
+            
