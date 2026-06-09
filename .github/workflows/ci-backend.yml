@@ -73,19 +73,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Verify test file exists
+        run: ls -la docker-compose.test.yaml
+
       - name: Run integration tests with Docker Compose
         run: |
-          docker compose -f docker-compose.test.yml up \
+          docker compose -f ./docker-compose.test.yaml up \
             --abort-on-container-exit \
             --exit-code-from backend-test
 
       - name: Show logs (always)
         if: always()
-        run: docker compose -f docker-compose.test.yml logs
+        run: docker compose -f ./docker-compose.test.yaml logs
 
       - name: Cleanup
         if: always()
-        run: docker compose -f docker-compose.test.yml down -v
+        run: docker compose -f ./docker-compose.test.yaml down -v
 
   # שלב 4 – Push to DockerHub
   push:
@@ -143,5 +146,3 @@ jobs:
             git pull
             docker compose up -d --build
             echo "✅ Deployed successfully to EC2!"
-
-            
