@@ -1,67 +1,114 @@
-import { describe, it, before, after } from 'node:test';
+import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
-import pkg from 'pg';
-const { Pool } = pkg;
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgres://postgres:postgres@db-test:5432/translations_test'
-});
+const BASE_URL = `http://localhost:3001`;
 
-async function waitForDB(maxRetries = 10) {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      await pool.query('SELECT 1');
-      console.log('✅ Database ready');
-      return;
-    } catch (err) {
-      console.log(`⏳ Waiting for DB... (${i + 1}/${maxRetries})`);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-  }
-  throw new Error('Database not ready');
+// ── Helper ──────────────────────────────────────────────────
+async function fetchJSON(path, options = {}) {
+  const res = await fetch(`${BASE_URL}${path}`, options);
+  const data = await res.json();
+  return { status: res.status, body: data };
 }
 
-describe('Database Integration Tests', () => {
-  
-  before(async () => {
-    await waitForDB();
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS translations (
-        id SERIAL PRIMARY KEY,
-        source_text TEXT NOT NULL,
-        translated_text TEXT NOT NULL,
-        target_lang VARCHAR(10),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+// ── Wait for server to be ready ─────────────────────────────
+before(async () => {
+  let retries = 10;
+  while (retries > 0) {
+    try {
+      await fetch(`${BASE_URL}/health`);
+      break;
+    } catch {
+      retries--;
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  }
+});
+
+// ── Health Check ────────────────────────────────────────────
+describe('Health Check', () => {
+
+  it('GET /health should return status ok', async () => {
+    const { status, body } = await fetchJSON('/health');
+    assert.strictEqual(status, 200);
+    assert.strictEqual(body.status, 'ok');
+    assert.ok(body.timestamp);
   });
 
-  after(async () => {
-    await pool.query('DROP TABLE IF EXISTS translations');
-    await pool.end();
+});
+
+// ── Translate Endpoint ──────────────────────────────────────
+describe('POST /translate', () => {
+
+  it('should translate text successfully', async () => {
+    const { status, body } = await fetchJSON('/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: 'Hello', target: 'es' })
+    });
+    assert.strictEqual(status, 200);
+    assert.ok(body.translatedText);
+    assert.strictEqual(typeof body.translatedText, 'string');
   });
 
-  it('should connect to database', async () => {
-    const result = await pool.query('SELECT NOW()');
-    assert.ok(result.rows.length > 0);
+  it('should return 400 when text is missing', async () => {
+    const { status, body } = await fetchJSON('/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target: 'es' })
+    });
+    assert.strictEqual(status, 400);
+    assert.ok(body.error);
   });
 
-  it('should insert translation', async () => {
-    const result = await pool.query(
-      'INSERT INTO translations (source_text, target_lang, translated_text) VALUES ($1, $2, $3) RETURNING id',
-      ['Hello', 'es', 'Hola']
-    );
-    assert.ok(result.rows[0].id);
+  it('should return 400 when target is missing', async () => {
+    const { status, body } = await fetchJSON('/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: 'Hello' })
+    });
+    assert.strictEqual(status, 400);
+    assert.ok(body.error);
   });
 
-  it('should retrieve translations', async () => {
-    await pool.query(
-      'INSERT INTO translations (source_text, target_lang, translated_text) VALUES ($1, $2, $3)',
-      ['Test', 'fr', 'Tester']
-    );
-    
-    const result = await pool.query('SELECT * FROM translations WHERE source_text = $1', ['Test']);
-    assert.strictEqual(result.rows.length, 1);
-    assert.strictEqual(result.rows[0].source_text, 'Test');
+  it('should return 400 when body is empty', async () => {
+    const { status, body } = await fetchJSON('/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    assert.strictEqual(status, 400);
+    assert.ok(body.error);
   });
+
+});
+
+// ── History Endpoint ────────────────────────────────────────
+describe('GET /history', () => {
+
+  it('should return an array', async () => {
+    const { status, body } = await fetchJSON('/history');
+    assert.strictEqual(status, 200);
+    assert.ok(Array.isArray(body));
+  });
+
+  it('should return max 10 results', async () => {
+    const { body } = await fetchJSON('/history');
+    assert.ok(body.length <= 10);
+  });
+
+  it('history items should have source_text and translated_text fields', async () => {
+    // First add a translation so history is not empty
+    await fetchJSON('/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: 'Hello', target: 'fr' })
+    });
+
+    const { body } = await fetchJSON('/history');
+    if (body.length > 0) {
+      assert.ok('source_text' in body[0]);
+      assert.ok('translated_text' in body[0]);
+    }
+  });
+
 });
