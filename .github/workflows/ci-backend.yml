@@ -52,14 +52,14 @@ jobs:
         with:
           context: ./backend
           push: false
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend:${{ github.sha }}
+          tags: backend-test-image:latest
           load: true
 
       - name: Test Docker image runs
         run: |
-          docker run --rm ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend:${{ github.sha }} node --version
+          docker run --rm backend-test-image:latest node --version
           echo "✅ Docker image works!"
-
+          
   # שלב 3 – Integration Tests
   integration-tests:
     name: Run Integration Tests
