@@ -2,7 +2,7 @@ name: CI Backend
 
 on:
   push:
-    branches: [main, feature/ci-cd]
+    branches: [main, feature/ci-cd, ci/cd]
     paths:
       - 'backend/**'
       - '.github/workflows/ci-backend.yml'
@@ -12,28 +12,41 @@ on:
       - 'backend/**'
 
 jobs:
+
+  # שלב 1 – Unit Tests
   unit-tests:
     name: Run Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+
       - name: Install dependencies
         working-directory: ./backend
         run: npm install
+
       - name: Run unit tests
         working-directory: ./backend
         run: npm test
 
+      - name: Test summary
+        run: echo "✅ Unit tests passed!"
+
+  # שלב 2 – Build Docker Image
   build:
     name: Build Docker Image
     runs-on: ubuntu-latest
     needs: unit-tests
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
@@ -42,18 +55,61 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend:${{ github.sha }}
           load: true
 
+      - name: Test Docker image runs
+        run: |
+          docker run --rm ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend:${{ github.sha }} node --version
+          echo "✅ Docker image works!"
+
+  # שלב 3 – Integration Tests
+  integration-tests:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+    needs: build
+    if: |
+      github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/ci/cd' ||
+      github.ref == 'refs/heads/feature/ci-cd' ||
+      github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run integration tests with Docker Compose
+        run: |
+          docker compose -f docker-compose.test.yml up \
+            --abort-on-container-exit \
+            --exit-code-from backend-test
+
+      - name: Show logs (always)
+        if: always()
+        run: docker compose -f docker-compose.test.yml logs
+
+      - name: Cleanup
+        if: always()
+        run: docker compose -f docker-compose.test.yml down -v
+
+  # שלב 4 – Push to DockerHub
   push:
     name: Push to DockerHub
     runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'push'
+    needs: [build, integration-tests]
+    if: |
+      always() &&
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ci/cd' || github.ref == 'refs/heads/feature/ci-cd') &&
+      needs.build.result == 'success' &&
+      (needs.integration-tests.result == 'success' || needs.integration-tests.result == 'skipped')
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -63,6 +119,27 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/app-translator-backend:${{ github.sha }}
 
+      - name: Push summary
+        run: echo "✅ Image pushed!"
 
-
-            
+  # שלב 5 – Deploy to EC2
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: push
+    if: |
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ci/cd') &&
+      needs.push.result == 'success'
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd app-translator
+            git pull
+            docker compose up -d --build
+            echo "✅ Deployed successfully to EC2!"
