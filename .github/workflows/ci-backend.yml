@@ -143,3 +143,5 @@ jobs:
             git pull
             docker compose up -d --build
             echo "✅ Deployed successfully to EC2!"
+
+            
