@@ -1,5 +1,11 @@
 🚀 App Translator Project
+
 Full DevOps & Cloud-Native Microservices Platform
+
+App Translator is a cloud-native microservices platform that enables users to translate text through a scalable and production-ready infrastructure.
+
+The project focuses on implementing modern DevOps practices including Kubernetes orchestration, CI/CD automation, secure cloud deployment, and infrastructure scalability using AWS services.
+
 📌 Project Overview
 
 App Translator is a complete end-to-end DevOps project that demonstrates modern cloud-native application deployment using:
@@ -30,35 +36,26 @@ PostgreSQL	Persistent database storage
 Users
    │
    ▼
-   
 CloudFront CDN
 
    │
-   ▼
-   
+   ▼   
 AWS S3 Static Hosting
-
    │
-   ▼
-   
+   ▼   
 Frontend Service (NGINX)
-
    │
-   ▼
-   
+   ▼   
 Backend API (Node.js)
-
    │
-   ▼
-   
+   ▼   
 LibreTranslate Service
-
    │
-   ▼
-   
+   ▼  
 PostgreSQL Database
 
 ⚙️ Technologies Used
+
 Category	Technologies
 Frontend	HTML, JavaScript, NGINX
 Backend	Node.js, Express
@@ -79,7 +76,6 @@ Persistence	PVC + StatefulSet
 📂 Project Structure
 
 AppTranslatorProject/
-
 │
 ├── .github/workflows/
 
@@ -176,6 +172,7 @@ Run Full Application
 docker compose up -d
 Run Test Environment
 docker compose -f docker-compose.test.yml up
+
 ☸️ Kubernetes Deployment
 
 The application was deployed to Kubernetes using:
@@ -187,7 +184,9 @@ ConfigMaps
 Secrets
 Persistent Volumes
 Ingress
+
 📦 Kubernetes Components
+
 Component	Purpose
 Deployment	Stateless application management
 StatefulSet	Persistent PostgreSQL storage
@@ -196,6 +195,7 @@ ConfigMap	Database configuration
 Secret	Sensitive credentials
 PVC	Persistent database storage
 Ingress	External access routing
+
 🌐 Kubernetes Networking
 
 Ingress NGINX was used to expose the application externally.
@@ -204,6 +204,7 @@ Example Routing
 Path	Destination
 /	Frontend
 /api	Backend API
+
 🗄️ PostgreSQL Persistence
 
 The database uses:
@@ -298,6 +299,7 @@ EC2	Backend deployment
 S3	Static frontend hosting
 CloudFront	CDN distribution
 IAM OIDC	Secure GitHub authentication
+
 🧪 Testing Strategy
 
 The project includes:
@@ -307,7 +309,9 @@ Unit Tests	Backend functionality
 Integration Tests	Multi-service validation
 Docker Validation	Container verification
 Health Checks	Kubernetes readiness
+
 ❤️ Kubernetes Health Checks
+
 Liveness Probe
 livenessProbe:
   httpGet:
@@ -333,6 +337,7 @@ kubectl get pods
 kubectl logs deployment/backend
 kubectl describe pod <POD_NAME>
 kubectl get events
+
 📈 Production Best Practices Implemented
 
 ✅ Multi-stage CI/CD Pipelines
