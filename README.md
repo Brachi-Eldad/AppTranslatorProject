@@ -30,22 +30,34 @@ PostgreSQL	Persistent database storage
 Users
    │
    ▼
+   
 CloudFront CDN
+
    │
    ▼
+   
 AWS S3 Static Hosting
+
    │
    ▼
+   
 Frontend Service (NGINX)
+
    │
    ▼
+   
 Backend API (Node.js)
+
    │
    ▼
+   
 LibreTranslate Service
+
    │
    ▼
+   
 PostgreSQL Database
+
 ⚙️ Technologies Used
 Category	Technologies
 Frontend	HTML, JavaScript, NGINX
@@ -63,47 +75,88 @@ Secrets	Kubernetes Secrets, Sealed Secrets
 Authentication	AWS OIDC
 Networking	Kubernetes Ingress
 Persistence	PVC + StatefulSet
+
 📂 Project Structure
+
 AppTranslatorProject/
+
 │
 ├── .github/workflows/
+
 │   ├── ci-backend.yml
+
 │   └── ci-frontend.yml
+
 │
+
 ├── backend/
+
 │   ├── Dockerfile
+
 │   ├── package.json
+
 │   ├── server.js
+
 │   ├── server.test.js
+
 │   └── server.integration.test.js
+
 │
+
 ├── frontend/
+
 │   ├── Dockerfile
+
 │   ├── index.html
+
 │   ├── nginx.conf
+
 │   └── script.js
+
 │
+
 ├── db/
+
 │   └── init.sql
+
 │
+
 ├── helm/
+
 │   ├── templates/
+
 │   ├── Chart.yaml
+
 │   ├── values.yaml
+
 │   └── sealed-postgres-password.yaml
+
 │
+
 ├── k8s/
+
 │   ├── backend-deployment.yaml
+
 │   ├── backend-service.yaml
+
 │   ├── db-statefulset.yaml
+
 │   ├── db-pvc.yaml
+
 │   ├── db-secret.yaml
+
 │   ├── libretranslate.yaml
+
 │   └── frontend.yaml
+
 │
+
 ├── docker-compose.yml
+
 ├── docker-compose.test.yml
+
 └── README.md
+
 🐳 Docker Implementation
 
 The project uses Docker for full containerization of all services.
