@@ -35,22 +35,27 @@ PostgreSQL	Persistent database storage
 ☁️ Infrastructure Architecture
 Users
    │
+   |
    ▼
 CloudFront CDN
-
    │
+   |
    ▼   
 AWS S3 Static Hosting
    │
+   |
    ▼   
 Frontend Service (NGINX)
    │
+   |
    ▼   
 Backend API (Node.js)
    │
+   |
    ▼   
 LibreTranslate Service
    │
+   |
    ▼  
 PostgreSQL Database
 
@@ -77,80 +82,81 @@ Persistence	PVC + StatefulSet
 
 AppTranslatorProject/
 │
+|
 ├── .github/workflows/
-
+|
 │   ├── ci-backend.yml
-
+|
 │   └── ci-frontend.yml
-
+|
 │
-
+|
 ├── backend/
-
+|
 │   ├── Dockerfile
-
+|
 │   ├── package.json
-
+|
 │   ├── server.js
-
+|
 │   ├── server.test.js
-
+|
 │   └── server.integration.test.js
-
+|
 │
-
+|
 ├── frontend/
-
+|
 │   ├── Dockerfile
-
+|
 │   ├── index.html
-
+|
 │   ├── nginx.conf
-
+|
 │   └── script.js
-
+|
 │
-
+|
 ├── db/
-
+|
 │   └── init.sql
-
+|
 │
-
+|
 ├── helm/
-
+|
 │   ├── templates/
-
+|
 │   ├── Chart.yaml
-
+|
 │   ├── values.yaml
-
+|
 │   └── sealed-postgres-password.yaml
-
+|
 │
-
+|
 ├── k8s/
-
+|
 │   ├── backend-deployment.yaml
-
+|
 │   ├── backend-service.yaml
-
+|
 │   ├── db-statefulset.yaml
-
+|
 │   ├── db-pvc.yaml
-
+|
 │   ├── db-secret.yaml
-
+|
 │   ├── libretranslate.yaml
-
+|
 │   └── frontend.yaml
-
+|
 │
-
+|
 ├── docker-compose.yml
-
+|
 ├── docker-compose.test.yml
-
+|
 └── README.md
 
 🐳 Docker Implementation
