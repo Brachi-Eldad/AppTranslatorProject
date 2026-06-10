@@ -186,6 +186,7 @@ Helm Installation
 helm install app-translator ./helm
 Helm Upgrade
 helm upgrade app-translator ./helm
+
 🔄 CI/CD Pipelines
 
 The project includes two separate production-style CI/CD pipelines:
@@ -264,6 +265,7 @@ readinessProbe:
   httpGet:
     path: /health
     port: 3001
+    
 🛠️ Debugging & Troubleshooting
 
 The project included troubleshooting scenarios such as:
@@ -281,18 +283,31 @@ kubectl get events
 📈 Production Best Practices Implemented
 
 ✅ Multi-stage CI/CD Pipelines
+
 ✅ Docker Image Validation
+
 ✅ Integration Testing
+
 ✅ SHA Image Tagging
+
 ✅ Secure Secret Management
+
 ✅ OIDC Authentication
+
 ✅ Kubernetes StatefulSets
+
 ✅ Persistent Storage
+
 ✅ Ingress Networking
+
 ✅ Helm Templating
+
 ✅ CloudFront CDN Deployment
+
 ✅ Automated EC2 Deployment
+
 ✅ Separation of Environments
+
 ✅ Microservices Architecture
 
 🚀 DevOps Concepts Demonstrated
@@ -316,41 +331,72 @@ The project includes several advanced DevOps features beyond basic requirements:
 
 Advanced Feature	Status
 AWS OIDC Authentication	✅
+
 CloudFront CDN	✅
+
 Integration Testing	✅
+
 DockerHub SHA Tagging	✅
+
 Automatic EC2 Deployment	✅
+
 Sealed Secrets	✅
+
 Stateful PostgreSQL	✅
+
 Helm Charts	✅
+
 ✅ Requirements Verification
 
 Based on the repository structure and implementation:
 
 Requirement	Status
 Docker	✅ Completed
+
 Docker Compose	✅ Completed
+
 Backend API	✅ Completed
+
 Frontend Service	✅ Completed
+
 PostgreSQL	✅ Completed
+
 LibreTranslate	✅ Completed
+
 Kubernetes	✅ Completed
+
 Deployments	✅ Completed
+
 Services	✅ Completed
+
 StatefulSet	✅ Completed
+
 Persistent Volume	✅ Completed
+
 ConfigMap	✅ Completed
+
 Secrets	✅ Completed
+
 Sealed Secrets	✅ Completed
+
 Helm	✅ Completed
+
 CI/CD	✅ Completed
+
 Unit Tests	✅ Completed
+
 Integration Tests	✅ Completed
+
 DockerHub Push	✅ Completed
+
 EC2 Deployment	✅ Completed
+
 S3 Deployment	✅ Completed
+
 CloudFront	✅ Completed
+
 OIDC Authentication	✅ Completed
+
 🎯 Final Evaluation
 
 This project successfully demonstrates a complete cloud-native DevOps workflow and exceeds standard DevOps course requirements.
