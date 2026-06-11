@@ -65,6 +65,151 @@ PostgreSQL Database
 ```
 
 ---
+🎨 Backend CI/CD Architecture:
+┌──────────────────────────────┐
+│        GitHub Push           │
+│ backend/** changes detected  │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│     GitHub Actions Runner    │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│       Unit Tests Stage       │
+│  npm install + npm test      │
+└──────────────┬───────────────┘
+               │ success
+               ▼
+┌──────────────────────────────┐
+│      Docker Build Stage      │
+│ Build backend-test-image     │
+└──────────────┬───────────────┘
+               │ success
+               ▼
+┌──────────────────────────────┐
+│    Integration Tests Stage   │
+│ docker-compose.test.yml      │
+└──────────────┬───────────────┘
+               │ success
+               ▼
+┌──────────────────────────────┐
+│      DockerHub Push Stage    │
+│ latest + SHA image tags      │
+└──────────────┬───────────────┘
+               │ success
+               ▼
+┌──────────────────────────────┐
+│        Deploy to EC2         │
+│ docker compose up -d         │
+└──────────────────────────────┘
+
+---
+
+🎨 Frontend CI/CD Architecture:
+┌──────────────────────────────┐
+│        GitHub Push           │
+│ frontend/** changes detected │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│     GitHub Actions Runner    │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│      Frontend Build Stage    │
+│ Verify frontend files        │
+└──────────────┬───────────────┘
+               │ success
+               ▼
+┌──────────────────────────────┐
+│      AWS OIDC Auth Stage     │
+│ Temporary AWS credentials    │
+└──────────────┬───────────────┘
+               │ success
+               ▼
+┌──────────────────────────────┐
+│        Deploy to S3          │
+│ aws s3 sync frontend/        │
+└──────────────┬───────────────┘
+               │ success
+               ▼
+┌──────────────────────────────┐
+│  CloudFront Cache Invalidate │
+│ create-invalidation "/*"     │
+└──────────────────────────────┘
+
+---
+🚀 Full Microservices Architecture:
+                                ┌──────────────────────┐
+                                │      End Users       │
+                                └──────────┬───────────┘
+                                           │
+                                           ▼
+                              ┌────────────────────────┐
+                              │     CloudFront CDN     │
+                              └──────────┬─────────────┘
+                                         │
+                          ┌──────────────┴──────────────┐
+                          │                             │
+                          ▼                             ▼
+               ┌──────────────────┐         ┌──────────────────┐
+               │    AWS S3 Bucket │         │ Kubernetes Ingress│
+               │ Frontend Hosting │         │     NGINX         │
+               └──────────────────┘         └─────────┬─────────┘
+                                                       │
+                      ┌────────────────────────────────┼─────────────────────────────┐
+                      │                                │                             │
+                      ▼                                ▼                             ▼
+         ┌────────────────────┐         ┌────────────────────┐        ┌────────────────────┐
+         │ Frontend Service   │         │ Backend Service    │        │ Translator Service │
+         │ React + NGINX      │         │ Node.js API        │        │ LibreTranslate     │
+         └─────────┬──────────┘         └─────────┬──────────┘        └─────────┬──────────┘
+                   │                              │                               │
+                   ▼                              ▼                               │
+         ┌────────────────────┐         ┌────────────────────┐                    │
+         │ Frontend Pod(s)    │         │ Backend Pod(s)     │                    │
+         └────────────────────┘         └─────────┬──────────┘                    │
+                                                   │                               │
+                                                   ▼                               ▼
+                                         ┌────────────────────┐       ┌────────────────────┐
+                                         │ PostgreSQL Service │──────▶│ PostgreSQL DB      │
+                                         │ StatefulSet        │       │ Persistent Volume  │
+                                         └────────────────────┘       └────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────
+
+                        CI/CD + Registry + Cloud Infrastructure
+
+────────────────────────────────────────────────────────────────────────────
+
+        ┌────────────────────┐
+        │ GitHub Repository  │
+        └─────────┬──────────┘
+                  │
+                  ▼
+        ┌────────────────────┐
+        │ GitHub Actions     │
+        │ CI/CD Pipelines    │
+        └─────────┬──────────┘
+                  │
+                  ▼
+        ┌────────────────────┐
+        │ DockerHub Registry │
+        └─────────┬──────────┘
+                  │
+                  ▼
+        ┌────────────────────┐
+        │ AWS EC2 Instance   │
+        │ Kubernetes / Docker│
+        └────────────────────┘
+
+   ---
 
 # ⚙️ Technologies Used
 
